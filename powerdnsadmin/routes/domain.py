@@ -464,10 +464,10 @@ def add():
     # Get
     else:
         domain_override_toggle = False
+        catalog_zones = Domain.query.filter(Domain.type == 'Producer').all()
         # Admins and Operators can set to any account
         if current_user.role.name in ['Administrator', 'Operator']:
             accounts = Account.query.order_by(Account.name).all()
-            catalog_zones = Domain.query.filter(Domain.type == 'Producer').all()
             domain_override_toggle = True
         else:
             accounts = current_user.get_accounts()
