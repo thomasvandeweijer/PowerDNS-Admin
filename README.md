@@ -1,9 +1,13 @@
 # PowerDNS-Admin
+Based on the **dev** branch of [PowerDNS-Admin](https://github.com/PowerDNS-Admin/PowerDNS-Admin/) for added catalog zones support and session bug fixes. If you don't need these options please use the latest stable build from PowerDNS-Admin themselves, you can find that one here: https://hub.docker.com/r/powerdnsadmin/pda-legacy
 
-A PowerDNS web interface with advanced features.
+## Why?
+The last dev build from PowerDNS-Admin has a few bugs that needed to be fixed for the application to be stable enough to use. The development of the current implementation of PowerDNS-Admin seemed to have stopped ([project update](https://github.com/PowerDNS-Admin/PowerDNS-Admin/discussions/1708)) and there's no date as of yet for a version based on the new codebase.
 
-[![CodeQL](https://github.com/PowerDNS-Admin/PowerDNS-Admin/actions/workflows/codeql-analysis.yml/badge.svg?branch=master)](https://github.com/PowerDNS-Admin/PowerDNS-Admin/actions/workflows/codeql-analysis.yml)
-[![Docker Image](https://github.com/PowerDNS-Admin/PowerDNS-Admin/actions/workflows/build-and-publish.yml/badge.svg?branch=master)](https://github.com/PowerDNS-Admin/PowerDNS-Admin/actions/workflows/build-and-publish.yml)
+## Bug? What bug?
+The dev version introduces a new [/healthcheck page](https://github.com/PowerDNS-Admin/PowerDNS-Admin/commit/a0495dfc7dbba9b5eecd75127c2baa2d3a52e0f4) (which is used as healthcheck in the Docker container), this /healthcheck page was meant to create a session with a lifetime of 0 minutes, unfortunately it seems like it sets the global lifetime of sessions to 0 minutes for a short moment as the /healthcheck page is loaded. This bug can affect people browsing through the admin interface if they load a new page at the same time as the healthcheck is called. Since the healthcheck was called every 5 seconds with Docker, this would happen quite often.
+
+The catalog zone implementation also contained a bug where accounts who aren't admin couldn't create zones anymore because the list of catalog zones refused to load for them.
 
 #### Features:
 
@@ -23,14 +27,11 @@ A PowerDNS web interface with advanced features.
 - Easy IPv6 PTR record editing
 - Provides an API for zone and record management among other features
 - Provides full IDN/Punycode support
-
-## [Project Update - PLEASE READ!!!](https://github.com/PowerDNS-Admin/PowerDNS-Admin/discussions/1708)
+- Provides catalog zones support
 
 ## Running PowerDNS-Admin
 
 There are several ways to run PowerDNS-Admin. The quickest way is to use Docker.
-If you are looking to install and run PowerDNS-Admin directly onto your system, check out
-the [wiki](https://github.com/PowerDNS-Admin/PowerDNS-Admin/blob/master/docs/wiki/) for ways to do that.
 
 ### Docker
 
@@ -57,11 +58,11 @@ This creates a volume named `pda-data` to persist the default SQLite database wi
 1. Update the configuration   
    Edit the `docker-compose.yml` file to update the database connection string in `SQLALCHEMY_DATABASE_URI`.
    Other environment variables are mentioned in
-   the [AppSettings.defaults](https://github.com/PowerDNS-Admin/PowerDNS-Admin/blob/master/powerdnsadmin/lib/settings.py) dictionary.
+   the [AppSettings.defaults](https://github.com/thomasvandeweijer/PowerDNS-Admin/blob/main/powerdnsadmin/lib/settings.py) dictionary.
    To use a Docker-style secrets convention, one may append `_FILE` to the environment variables with a path to a file
    containing the intended value of the variable (e.g. `SQLALCHEMY_DATABASE_URI_FILE=/run/secrets/db_uri`).   
    Make sure to set the environment variable `SECRET_KEY` to a long, random
-   string (https://flask.palletsprojects.com/en/1.1.x/config/#SECRET_KEY)
+   string (https://flask.palletsprojects.com/en/1.1.x/config/#SECRET\_KEY)
 
 2. Start docker container
    ```
@@ -73,34 +74,3 @@ You can then access PowerDNS-Admin by pointing your browser to http://localhost:
 ## Screenshots
 
 ![dashboard](docs/screenshots/dashboard.png)
-
-## Support
-
-**Looking for help?** Try taking a look at the project's
-[Support Guide](https://github.com/PowerDNS-Admin/PowerDNS-Admin/blob/master/.github/SUPPORT.md) or joining
-our [Discord Server](https://discord.powerdnsadmin.org).
-
-## Security Policy
-
-Please see our [Security Policy](https://github.com/PowerDNS-Admin/PowerDNS-Admin/blob/master/SECURITY.md).
-
-## Contributing
-
-Please see our [Contribution Guide](https://github.com/PowerDNS-Admin/PowerDNS-Admin/blob/master/docs/CONTRIBUTING.md).
-
-## Code of Conduct
-
-Please see our [Code of Conduct Policy](https://github.com/PowerDNS-Admin/PowerDNS-Admin/blob/master/docs/CODE_OF_CONDUCT.md).
-
-## License
-
-This project is released under the MIT license. For additional
-information, [see the full license](https://github.com/PowerDNS-Admin/PowerDNS-Admin/blob/master/LICENSE).
-
-## [Donate](https://www.buymeacoffee.com/AzorianMatt)
-
-Like my work?
-
-<a href="https://www.buymeacoffee.com/AzorianMatt" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
-
-**Want to sponsor me?** Please visit my organization's [sponsorship page](https://github.com/sponsors/AzorianSolutions).
