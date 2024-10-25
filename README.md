@@ -48,7 +48,7 @@ $ docker run -d \
     -e SECRET_KEY='a-very-secret-key' \
     -v pda-data:/data \
     -p 9191:80 \
-    powerdnsadmin/pda-legacy:latest
+    thomasvandeweijer/powerdns-admin:latest
 ```
 
 This creates a volume named `pda-data` to persist the default SQLite database with app configuration.
@@ -62,7 +62,7 @@ This creates a volume named `pda-data` to persist the default SQLite database wi
    To use a Docker-style secrets convention, one may append `_FILE` to the environment variables with a path to a file
    containing the intended value of the variable (e.g. `SQLALCHEMY_DATABASE_URI_FILE=/run/secrets/db_uri`).   
    Make sure to set the environment variable `SECRET_KEY` to a long, random
-   string (https://flask.palletsprojects.com/en/1.1.x/config/#SECRET\_KEY)
+   string (https://flask.palletsprojects.com/en/1.1.x/config/#SECRET_KEY)
 
 2. Start docker container
    ```
